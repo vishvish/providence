@@ -19,9 +19,9 @@
           {
             home.username = username;
             home.homeDirectory = "/Users/${username}";
+            home-manager.backupFileExtension = "backup";
           }
         ];
-        backupFileExtension = "backup";
       };
     in
     {
