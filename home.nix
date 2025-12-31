@@ -5,6 +5,13 @@
 
   programs.home-manager.enable = true;
 
+  # Ensure nix profile bins precede Homebrew in PATH
+  home.sessionPath = [
+    "$HOME/.nix-profile/bin"
+    "/nix/var/nix/profiles/default/bin"
+    "/opt/homebrew/bin"
+  ];
+
   home.packages = with pkgs; [
     # CLI tools and utilities
     ack
