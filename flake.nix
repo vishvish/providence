@@ -7,13 +7,17 @@
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    dotfiles = {
+      url = "git+ssh://git@github.com/vishvish/dotfiles";
+      flake = false;
+    };
   };
 
-  outputs = { self, nixpkgs, home-manager }:
+  outputs = { self, nixpkgs, home-manager, dotfiles }:
     let
       mkHomeConfig = { username, hostname, system }: home-manager.lib.homeManagerConfiguration {
         pkgs = nixpkgs.legacyPackages.${system};
-        extraSpecialArgs = { inherit username hostname; };
+        extraSpecialArgs = { inherit username hostname dotfiles; };
         modules = [
           ./home.nix
           {

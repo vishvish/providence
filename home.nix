@@ -1,4 +1,4 @@
-{ config, pkgs, lib, ... }:
+{ config, pkgs, lib, dotfiles, ... }:
 
 {
   home.stateVersion = "24.11";
@@ -113,6 +113,11 @@
     enable = true;
     # Add zsh configuration
   };
+
+  # Link dotfiles from private repo
+  # Example: uncomment and customize based on your dotfiles structure
+  # home.file.".gitconfig".source = "${dotfiles}/.gitconfig";
+  # home.file.".config/nvim/init.vim".source = "${dotfiles}/.config/nvim/init.vim";
 
   # Back up existing zsh dotfiles once, before links are created
   home.activation.backupZshDotfiles = lib.hm.dag.entryBefore [ "checkLinkTargets" ] ''
