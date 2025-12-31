@@ -133,6 +133,7 @@
     ".zshrc".source = "${dotfiles}/zshrc";
     ".zprofile".source = "${dotfiles}/zprofile";
     ".zlogin".source = "${dotfiles}/zlogin";
+    ".zsh".source = "${dotfiles}/zsh"; # zsh functions and scripts
 
     # Bash config for those annoying apps that still use bash
     ".bashrc".source = "${dotfiles}/bashrc";

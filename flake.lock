@@ -1,5 +1,21 @@
 {
   "nodes": {
+    "dotfiles": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1763574509,
+        "narHash": "sha256-OMYq+CCSFC/FWYygksaoJL/Rhz4oqmHRdcfhd2WvkiQ=",
+        "ref": "refs/heads/main",
+        "rev": "9be6a715ffa109339a420da7d1ac7a4d340a1a15",
+        "revCount": 220,
+        "type": "git",
+        "url": "ssh://git@github.com/vishvish/dotfiles"
+      },
+      "original": {
+        "type": "git",
+        "url": "ssh://git@github.com/vishvish/dotfiles"
+      }
+    },
     "home-manager": {
       "inputs": {
         "nixpkgs": [
@@ -38,6 +54,7 @@
     },
     "root": {
       "inputs": {
+        "dotfiles": "dotfiles",
         "home-manager": "home-manager",
         "nixpkgs": "nixpkgs"
       }
