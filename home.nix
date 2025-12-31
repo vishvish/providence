@@ -111,7 +111,8 @@
 
   programs.zsh = {
     enable = true;
-    # Add zsh configuration
+    package = pkgs.zsh;          # use Nix-provided zsh
+    loginShell = true;           # set login shell to Nix zsh (runs chsh)
   };
 
   # Link dotfiles from private repo
@@ -144,6 +145,9 @@
     
     # I do like a good binary directory
     ".bin".source = "${dotfiles}/bin";
+
+    # Time for ssh configs
+    ".ssh".source = "${dotfiles}/ssh";
 
     # Add more as needed:
     # ".config/helix".source = "${dotfiles}/config/helix";
