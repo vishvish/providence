@@ -22,6 +22,36 @@ REPO_ROOT=$(cd -- "$SCRIPT_DIR/.." && pwd)
 LOCK_FILE="$REPO_ROOT/flake.lock"
 CONFIG="${HM_CONFIG:-vish@hobbes}"
 
+# Find flake root: prefer the repository the script was built from; otherwise
+# search upward from CWD; otherwise fall back to common paths; lastly GitHub.
+find_flake_root() {
+  if [ -f "$REPO_ROOT/flake.nix" ]; then
+    echo "$REPO_ROOT"
+    return 0
+  fi
+
+  local cur
+  cur=$(pwd)
+  while [ "$cur" != "/" ]; do
+    if [ -f "$cur/flake.nix" ]; then
+      echo "$cur"
+      return 0
+    fi
+    cur=$(dirname "$cur")
+  done
+
+  for candidate in "$HOME/git/system/providence" "$HOME/git/providence"; do
+    if [ -f "$candidate/flake.nix" ]; then
+      echo "$candidate"
+      return 0
+    fi
+  done
+
+  echo "github:vishvish/providence"
+}
+
+FLAKE_ROOT=$(find_flake_root)
+
 # Prefer explicit DOTFILES_LOCAL; otherwise pick the first existing candidate
 LOCAL_DOTFILES="${DOTFILES_LOCAL:-}"
 if [ -z "$LOCAL_DOTFILES" ]; then
@@ -63,12 +93,12 @@ if [ "$use_local" = true ]; then
   local_ref=$(git -C "$LOCAL_DOTFILES" rev-parse HEAD)
   local_uri="git+file://$LOCAL_DOTFILES?ref=$local_ref"
   echo "Using local dotfiles: $LOCAL_DOTFILES@$local_ref (ahead of pinned $locked_rev)" >&2
-  exec home-manager switch --flake "$flake_ref" --override-input dotfiles "$local_uri" "$@"
+  exec home-manager switch --flake "$FLAKE_ROOT#$CONFIG" --override-input dotfiles "$local_uri" "$@"
 else
   if [ -d "$LOCAL_DOTFILES/.git" ] && [ -n "$locked_rev" ]; then
     echo "Local dotfiles not ahead of pinned $locked_rev; using pinned flake input." >&2
   else
     echo "No usable local dotfiles; using pinned flake input." >&2
   fi
-  exec home-manager switch --flake "$flake_ref" "$@"
+  exec home-manager switch --flake "$FLAKE_ROOT#$CONFIG" "$@"
 fi
