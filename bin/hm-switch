@@ -15,10 +15,7 @@ ORIG_PATH="${BASH_SOURCE[0]:-$0}"
 if [ "${ORIG_PATH#/}" = "$ORIG_PATH" ]; then
   ORIG_PATH="$(pwd)/$ORIG_PATH"
 fi
-SCRIPT_PATH=$(python3 - <<'PY' "$ORIG_PATH")
-import os, sys
-print(os.path.realpath(sys.argv[1]))
-PY
+SCRIPT_PATH=$(python3 -c 'import os,sys; print(os.path.realpath(sys.argv[1]))' "$ORIG_PATH")
 SCRIPT_DIR=$(cd -- "$(dirname -- "$SCRIPT_PATH")" && pwd)
 REPO_ROOT=$(cd -- "$SCRIPT_DIR/.." && pwd)
 
@@ -42,14 +39,12 @@ get_locked_rev() {
   if [ ! -f "$LOCK_FILE" ]; then
     return 1
   fi
-  python3 - "$LOCK_FILE" <<'PY'
-import json, sys, pathlib
-lock = json.load(pathlib.Path(sys.argv[1]).open()) if len(sys.argv) > 1 else {}
+  python3 -c 'import json,sys,pathlib;
+from pathlib import Path
+lock = json.load(Path(sys.argv[1]).open())
 node = lock.get("nodes", {}).get("dotfiles", {})
 rev = node.get("locked", {}).get("rev")
-if rev:
-    print(rev)
-PY
+print(rev) if rev else None' "$LOCK_FILE"
 }
 
 locked_rev=$(get_locked_rev "$LOCK_FILE" || true)
