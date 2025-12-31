@@ -113,10 +113,8 @@
     deadnix
   ];
 
-  programs.zsh = {
-    enable = true;
-    package = pkgs.zsh;          # use Nix-provided zsh
-  };
+  # Just install zsh as a package - we manage config via dotfiles
+  # programs.zsh is disabled to avoid conflicts with our custom dotfiles
 
   # Link dotfiles from private repo
   home.file = {
@@ -158,17 +156,23 @@
 
   home.sessionVariables.SHELL = "${pkgs.zsh}/bin/zsh";
 
-  # Set login shell to the Nix-provided zsh using dscl (macOS), without relying on awk in PATH
+  # Set login shell to the Nix-provided zsh (macOS)
+  # 1. Add zsh to /etc/shells if not present
+  # 2. Use chsh to set as login shell
   home.activation.setLoginShell = lib.hm.dag.entryAfter [ "linkGeneration" ] ''
-    desired="${pkgs.zsh}/bin/zsh"
-    current=$(/usr/bin/dscl . -read /Users/"$USER" UserShell 2>/dev/null | /usr/bin/sed -n 's/^UserShell: //p')
-    if [ "$current" != "$desired" ]; then
-      if command -v sudo >/dev/null 2>&1; then
-        echo "Setting login shell to $desired (sudo required)..."
-        sudo /usr/bin/dscl . -create /Users/"$USER" UserShell "$desired" || echo "Failed to set login shell; please run manually: sudo dscl . -create /Users/$USER UserShell $desired" >&2
-      else
-        echo "Please set login shell manually: sudo dscl . -create /Users/$USER UserShell $desired" >&2
-      fi
+    ZSH_PATH="${pkgs.zsh}/bin/zsh"
+    
+    # Add to /etc/shells if not already there
+    if ! /bin/cat /etc/shells | /usr/bin/grep -q "^$ZSH_PATH$"; then
+      echo "Adding $ZSH_PATH to /etc/shells (sudo required)..."
+      echo "$ZSH_PATH" | sudo /usr/bin/tee -a /etc/shells >/dev/null
+    fi
+    
+    # Set login shell if different
+    CURRENT=$(/usr/bin/dscl . -read /Users/"$USER" UserShell 2>/dev/null | /usr/bin/cut -d' ' -f2)
+    if [ "$CURRENT" != "$ZSH_PATH" ]; then
+      echo "Setting login shell to $ZSH_PATH..."
+      /usr/bin/chsh -s "$ZSH_PATH"
     fi
   '';
 }
