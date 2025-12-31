@@ -16,7 +16,7 @@ For `hobbes-x` (Intel Mac):
 nix --extra-experimental-features 'nix-command flakes' run --refresh --no-write-lock-file github:vishvish/providence#homeConfigurations.vish@hobbes-x.activationPackage
 ```
 
-Existing dotfiles will be backed up automatically with a `.backup` extension.
+Existing `.zshrc` and `.zshenv` will be backed up once to `.backup` before linking.
 
 From GitHub:
 

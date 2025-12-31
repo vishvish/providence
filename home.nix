@@ -1,4 +1,4 @@
-{ config, pkgs, ... }:
+{ config, pkgs, lib, ... }:
 
 {
   home.stateVersion = "24.11";
@@ -107,7 +107,13 @@
     # Add zsh configuration
   };
 
-  # Back up existing zsh dotfiles on first apply
-  home.file.".zshrc".backupExtension = "backup";
-  home.file.".zshenv".backupExtension = "backup";
+  # Back up existing zsh dotfiles once, before links are created
+  home.activation.backupZshDotfiles = lib.hm.dag.entryBefore [ "checkLinkTargets" ] ''
+    for f in .zshrc .zshenv; do
+      if [ -e "$HOME/$f" ] && [ ! -e "$HOME/$f.backup" ]; then
+        echo "Backing up $HOME/$f to $HOME/$f.backup"
+        mv "$HOME/$f" "$HOME/$f.backup"
+      fi
+    done
+  '';
 }
