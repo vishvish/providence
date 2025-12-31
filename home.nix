@@ -48,10 +48,13 @@
     nmap
     pandoc
     pgcli
+    pokemonsay
+    ponysay
     rename
     ripgrep
     shellcheck
     starship
+    tmux
     tokei
     tree
     tor

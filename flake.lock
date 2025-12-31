@@ -3,11 +3,11 @@
     "dotfiles": {
       "flake": false,
       "locked": {
-        "lastModified": 1767165429,
-        "narHash": "sha256-UCQDCx8K6Cgnk/eguYCqkZzjc3FvJm7P8mqov6ZjV5g=",
+        "lastModified": 1767175078,
+        "narHash": "sha256-+HD+jYYMa1bYBJn3ropQCL2QerEWsGRFrfisJRT4bv4=",
         "ref": "refs/heads/main",
-        "rev": "c9a5502ab0ac7e2e28197c63585d673eeb59b705",
-        "revCount": 224,
+        "rev": "c2f62c9884b9e45f3fabd026e49947ae82aa74df",
+        "revCount": 229,
         "type": "git",
         "url": "ssh://git@github.com/vishvish/dotfiles"
       },
