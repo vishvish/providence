@@ -165,7 +165,7 @@
     # Add to /etc/shells if not already there
     if ! /bin/cat /etc/shells | /usr/bin/grep -q "^$ZSH_PATH$"; then
       echo "Adding $ZSH_PATH to /etc/shells (sudo required)..."
-      echo "$ZSH_PATH" | sudo /usr/bin/tee -a /etc/shells >/dev/null
+      echo "$ZSH_PATH" | /usr/bin/sudo /usr/bin/tee -a /etc/shells >/dev/null
     fi
     
     # Set login shell if different
