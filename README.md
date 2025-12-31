@@ -59,3 +59,24 @@ nix flake update
 home-manager switch --flake ".#vish@hobbes"
 ```
 
+## Touch ID for sudo (Nix pam_reattach)
+
+Use the Nix-built helper to install `pam_reattach` into `/etc/pam.d/sudo_local` and keep Homebrew out of the PAM chain:
+
+```bash
+# Build the helper (pick the right arch: aarch64-darwin or x86_64-darwin)
+nix build .#packages.aarch64-darwin.setup-pam-reattach
+
+# Apply to /etc/pam.d/sudo_local (makes a timestamped backup first)
+sudo ./result/bin/setup-pam-reattach
+
+# Sanity-check sudo/Touch ID
+sudo -n true
+```
+
+The helper writes two lines to `/etc/pam.d/sudo_local`:
+- `auth optional <nix-store>/lib/pam/pam_reattach.so`
+- `auth sufficient pam_tid.so`
+
+Re-run the helper after updating `nixpkgs` so the sudo stack points at the current Nix store path.
+
