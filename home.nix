@@ -27,6 +27,7 @@
     delta
     eza
     exiftool
+    gawk
     figlet
     fortune
     gh
