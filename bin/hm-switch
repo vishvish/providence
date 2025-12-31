@@ -1,0 +1,55 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Home-manager switch helper that prefers a local dotfiles checkout when it's ahead
+# of the flake-pinned revision. Falls back to the pinned input otherwise.
+#
+# Env overrides:
+#   HM_CONFIG      - home-manager config name (default: vish@hobbes)
+#   DOTFILES_LOCAL - path to local dotfiles repo (default: $HOME/git/dotfiles)
+#
+# Usage: ./bin/hm-switch [extra home-manager args]
+
+SCRIPT_DIR=$(cd -- "$(dirname -- "$0")" && pwd)
+REPO_ROOT=$(cd -- "$SCRIPT_DIR/.." && pwd)
+LOCK_FILE="$REPO_ROOT/flake.lock"
+CONFIG="${HM_CONFIG:-vish@hobbes}"
+LOCAL_DOTFILES="${DOTFILES_LOCAL:-$HOME/git/system/dotfiles}"
+
+get_locked_rev() {
+  if [ ! -f "$LOCK_FILE" ]; then
+    return 1
+  fi
+  python3 - <<'PY'
+import json, sys, pathlib
+lock = json.load(pathlib.Path(sys.argv[1]).open())
+node = lock.get("nodes", {}).get("dotfiles", {})
+rev = node.get("locked", {}).get("rev")
+if rev:
+    print(rev)
+PY
+}
+
+locked_rev=$(get_locked_rev "$LOCK_FILE" || true)
+use_local=false
+
+if [ -d "$LOCAL_DOTFILES/.git" ] && [ -n "$locked_rev" ]; then
+  if git -C "$LOCAL_DOTFILES" cat-file -e "$locked_rev^{commit}" 2>/dev/null; then
+    if git -C "$LOCAL_DOTFILES" merge-base --is-ancestor "$locked_rev" HEAD 2>/dev/null; then
+      use_local=true
+    fi
+  fi
+fi
+
+flake_ref="$REPO_ROOT#$CONFIG"
+if [ "$use_local" = true ]; then
+  echo "Using local dotfiles: $LOCAL_DOTFILES (ahead of pinned $locked_rev)" >&2
+  exec home-manager switch --flake "$flake_ref" --override-input dotfiles "path:$LOCAL_DOTFILES" "$@"
+else
+  if [ -d "$LOCAL_DOTFILES/.git" ] && [ -n "$locked_rev" ]; then
+    echo "Local dotfiles not ahead of pinned $locked_rev; using pinned flake input." >&2
+  else
+    echo "No usable local dotfiles; using pinned flake input." >&2
+  fi
+  exec home-manager switch --flake "$flake_ref" "$@"
+fi

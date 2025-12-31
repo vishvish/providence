@@ -130,10 +130,7 @@
     # Zsh config
     ".zshenv".source = "${dotfiles}/zshenv";
     ".zshrc".source = "${dotfiles}/zshrc";
-    ".zprofile".text = lib.replaceStrings
-      [ "source /opt/homebrew/opt/autoenv/activate.sh" ]
-      [ "[ -r /opt/homebrew/opt/autoenv/activate.sh ] && source /opt/homebrew/opt/autoenv/activate.sh" ]
-      (builtins.readFile "${dotfiles}/zprofile");
+    ".zprofile".source = "${dotfiles}/zprofile";
     ".zlogin".source = "${dotfiles}/zlogin";
     ".zsh".source = "${dotfiles}/zsh"; # zsh functions and scripts
 

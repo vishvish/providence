@@ -80,3 +80,21 @@ The helper writes two lines to `/etc/pam.d/sudo_local`:
 
 Re-run the helper after updating `nixpkgs` so the sudo stack points at the current Nix store path.
 
+## Faster dotfiles + home-manager switch
+
+Use the helper to prefer a local dotfiles checkout when it is ahead of the pinned flake input:
+
+```bash
+./bin/hm-switch                         # defaults to vish@hobbes
+HM_CONFIG=vish@hobbes-x ./bin/hm-switch  # pick another host
+```
+
+Behavior:
+- If `$HOME/git/system/dotfiles` exists, contains the pinned `dotfiles` rev, and is ahead of it, the helper runs `home-manager switch` with `--override-input dotfiles path:$HOME/git/system/dotfiles`.
+- Otherwise it falls back to the pinned `dotfiles` input from `flake.lock`.
+
+To update the pin after pushing dotfiles:
+```bash
+nix flake lock --update-input dotfiles
+```
+
