@@ -147,6 +147,13 @@
     # Time for ssh configs
     ".ssh/config".source = "${dotfiles}/ssh/config";
 
+    # And other configs...
+    ".config/nvim".source = "${dotfiles}/config/nvim";
+    ".config/starship.toml".source = "${dotfiles}/config/starship.toml";
+    ".config/atuin".source = "${dotfiles}/config/atuin";
+    ".config/tmuxinator".source = "${dotfiles}/config/tmuxinator";
+    ".config/eza".source = "${dotfiles}/config/eza";
+    ".config/eza-themes".source = "${dotfiles}/config/eza-themes";
 
     # Add more as needed:
     # ".config/helix".source = "${dotfiles}/config/helix";
