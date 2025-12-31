@@ -13,6 +13,7 @@
     let
       mkHomeConfig = { username, hostname, system }: home-manager.lib.homeManagerConfiguration {
         pkgs = nixpkgs.legacyPackages.${system};
+        extraSpecialArgs = { inherit username hostname; };
         modules = [
           ./home.nix
           {
@@ -20,6 +21,7 @@
             home.homeDirectory = "/Users/${username}";
           }
         ];
+        backupFileExtension = "backup";
       };
     in
     {
