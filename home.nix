@@ -112,14 +112,10 @@
   programs.zsh = {
     enable = true;
     package = pkgs.zsh;          # use Nix-provided zsh
-    loginShell = true;           # set login shell to Nix zsh (runs chsh)
   };
 
   # Link dotfiles from private repo
   home.file = {
-    # Entire config directory
-    ".config".source = "${dotfiles}/config";
-
     # Top-level dotfiles
     ".gitconfig".source = "${dotfiles}/gitconfig";
     ".gitignore".source = "${dotfiles}/gitignore";
@@ -147,7 +143,8 @@
     ".bin".source = "${dotfiles}/bin";
 
     # Time for ssh configs
-    ".ssh".source = "${dotfiles}/ssh";
+    ".ssh/config".source = "${dotfiles}/ssh/config";
+
 
     # Add more as needed:
     # ".config/helix".source = "${dotfiles}/config/helix";
@@ -155,13 +152,8 @@
     # ".aws/config".source = "${dotfiles}/aws/config";
   };
 
-  # Back up existing zsh dotfiles once, before links are created
-  # home.activation.backupZshDotfiles = lib.hm.dag.entryBefore [ "checkLinkTargets" ] ''
-  #   for f in .zshrc .zshenv; do
-  #     if [ -e "$HOME/$f" ] && [ ! -e "$HOME/$f.backup" ]; then
-  #       echo "Backing up $HOME/$f to $HOME/$f.backup"
-  #       mv "$HOME/$f" "$HOME/$f.backup"
-  #     fi
-  #   done
-  # '';
+  # Set login shell to the Nix-provided zsh
+  home.activation.setLoginShell = lib.hm.dag.entryAfter [ "linkGeneration" ] ''
+    ${pkgs.zsh}/bin/zsh -c "chsh -s ${pkgs.zsh}/bin/zsh"
+  '';
 }
