@@ -156,6 +156,15 @@
 
   # Set login shell to the Nix-provided zsh using dscl (macOS)
   home.activation.setLoginShell = lib.hm.dag.entryAfter [ "linkGeneration" ] ''
-    /usr/bin/dscl . -create /Users/vish UserShell ${pkgs.zsh}/bin/zsh
+    desired="${pkgs.zsh}/bin/zsh"
+    current=$(/usr/bin/dscl . -read /Users/"$USER" UserShell 2>/dev/null | awk '{print $2}')
+    if [ "$current" != "$desired" ]; then
+      if command -v sudo >/dev/null 2>&1; then
+        echo "Setting login shell to $desired (sudo required)..."
+        sudo /usr/bin/dscl . -create /Users/"$USER" UserShell "$desired" || echo "Failed to set login shell; please run manually: sudo dscl . -create /Users/$USER UserShell $desired" >&2
+      else
+        echo "Please set login shell manually: sudo dscl . -create /Users/$USER UserShell $desired" >&2
+      fi
+    fi
   '';
 }
