@@ -29,7 +29,7 @@
           hostname = "hobbes";
           system = "aarch64-darwin";
         };
-        
+
         "vish@hobbes-x" = mkHomeConfig {
           username = "vish";
           hostname = "hobbes-x";
