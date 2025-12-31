@@ -7,6 +7,7 @@
 
   # Ensure nix profile bins precede Homebrew in PATH
   home.sessionPath = [
+    "$HOME/.local/bin"
     "$HOME/.nix-profile/bin"
     "/nix/var/nix/profiles/default/bin"
     "${pkgs.gawk}/bin"
@@ -136,6 +137,9 @@
     ".zprofile".source = "${dotfiles}/zprofile";
     ".zlogin".source = "${dotfiles}/zlogin";
     ".zsh".source = "${dotfiles}/zsh"; # zsh functions and scripts
+
+    # Local helpers
+    ".local/bin/hm-switch".source = ./bin/hm-switch;
 
     # Bash config for those annoying apps that still use bash
     ".bashrc".source = "${dotfiles}/bashrc";
