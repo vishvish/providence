@@ -9,6 +9,7 @@
   home.sessionPath = [
     "$HOME/.nix-profile/bin"
     "/nix/var/nix/profiles/default/bin"
+    "${pkgs.gawk}/bin"
     "/usr/bin"
     "/bin"
     "/opt/homebrew/bin"
