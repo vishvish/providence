@@ -7,14 +7,16 @@ A Nix flake-based home-manager configuration for bootstrapping macOS machines.
 Bootstrap your machine directly from this flake without installing home-manager first:
 
 ```bash
-nix --extra-experimental-features 'nix-command flakes' run --no-write-lock-file github:vishvish/providence#homeConfigurations.vish@hobbes.activationPackage
+nix --extra-experimental-features 'nix-command flakes' run --refresh --no-write-lock-file github:vishvish/providence#homeConfigurations.vish@hobbes.activationPackage
 ```
 
 For `hobbes-x` (Intel Mac):
 
 ```bash
-nix --extra-experimental-features 'nix-command flakes' run --no-write-lock-file github:vishvish/providence#homeConfigurations.vish@hobbes-x.activationPackage
+nix --extra-experimental-features 'nix-command flakes' run --refresh --no-write-lock-file github:vishvish/providence#homeConfigurations.vish@hobbes-x.activationPackage
 ```
+
+Existing dotfiles will be backed up automatically with a `.backup` extension.
 
 From GitHub:
 

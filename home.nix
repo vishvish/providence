@@ -2,6 +2,7 @@
 
 {
   home.stateVersion = "24.11";
+  home.backupFileExtension = "backup";
 
   programs.home-manager.enable = true;
 
