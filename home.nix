@@ -115,17 +115,48 @@
   };
 
   # Link dotfiles from private repo
-  # Example: uncomment and customize based on your dotfiles structure
-  # home.file.".gitconfig".source = "${dotfiles}/.gitconfig";
-  # home.file.".config/nvim/init.vim".source = "${dotfiles}/.config/nvim/init.vim";
+  home.file = {
+    # Entire config directory
+    ".config".source = "${dotfiles}/config";
+
+    # Top-level dotfiles
+    ".gitconfig".source = "${dotfiles}/gitconfig";
+    ".gitignore".source = "${dotfiles}/gitignore";
+    ".vimrc".source = "${dotfiles}/vimrc";
+    ".tmux.conf".source = "${dotfiles}/tmux.conf";
+    ".tmux-powerlinerc".source = "${dotfiles}/tmux-powerlinerc";
+    ".digrc".source = "${dotfiles}/digrc";
+    ".tigrc".source = "${dotfiles}/tigrc";
+    
+    # Zsh config
+    ".zshenv".source = "${dotfiles}/zshenv";
+    ".zshrc".source = "${dotfiles}/zshrc";
+    ".zprofile".source = "${dotfiles}/zprofile";
+    ".zlogin".source = "${dotfiles}/zlogin";
+
+    # Bash config for those annoying apps that still use bash
+    ".bashrc".source = "${dotfiles}/bashrc";
+    ".bash_profile".source = "${dotfiles}/bash_profile";
+
+    # Fortunes
+    ".fortunes".source = "${dotfiles}/fortunes";
+    
+    # I do like a good binary directory
+    ".bin".source = "${dotfiles}/bin";
+
+    # Add more as needed:
+    # ".config/helix".source = "${dotfiles}/config/helix";
+    # ".config/kitty".source = "${dotfiles}/config/kitty";
+    # ".aws/config".source = "${dotfiles}/aws/config";
+  };
 
   # Back up existing zsh dotfiles once, before links are created
-  home.activation.backupZshDotfiles = lib.hm.dag.entryBefore [ "checkLinkTargets" ] ''
-    for f in .zshrc .zshenv; do
-      if [ -e "$HOME/$f" ] && [ ! -e "$HOME/$f.backup" ]; then
-        echo "Backing up $HOME/$f to $HOME/$f.backup"
-        mv "$HOME/$f" "$HOME/$f.backup"
-      fi
-    done
-  '';
+  # home.activation.backupZshDotfiles = lib.hm.dag.entryBefore [ "checkLinkTargets" ] ''
+  #   for f in .zshrc .zshenv; do
+  #     if [ -e "$HOME/$f" ] && [ ! -e "$HOME/$f.backup" ]; then
+  #       echo "Backing up $HOME/$f to $HOME/$f.backup"
+  #       mv "$HOME/$f" "$HOME/$f.backup"
+  #     fi
+  #   done
+  # '';
 }
