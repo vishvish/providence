@@ -10,8 +10,14 @@ set -euo pipefail
 #
 # Usage: ./bin/hm-switch [extra home-manager args]
 
-SCRIPT_DIR=$(cd -- "$(dirname -- "$0")" && pwd)
+# Resolve real script location even if called via symlink
+SCRIPT_PATH="$0"
+if [ -L "$SCRIPT_PATH" ]; then
+  SCRIPT_PATH=$(readlink "$SCRIPT_PATH")
+fi
+SCRIPT_DIR=$(cd -- "$(dirname -- "$SCRIPT_PATH")" && pwd)
 REPO_ROOT=$(cd -- "$SCRIPT_DIR/.." && pwd)
+
 LOCK_FILE="$REPO_ROOT/flake.lock"
 CONFIG="${HM_CONFIG:-vish@hobbes}"
 LOCAL_DOTFILES="${DOTFILES_LOCAL:-$HOME/git/system/dotfiles}"
