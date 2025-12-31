@@ -94,10 +94,20 @@
     fzf
     curl
     unzip
+
+    # Nix tooling / LSP
+    nixd
+    alejandra
+    statix
+    deadnix
   ];
 
   programs.zsh = {
     enable = true;
     # Add zsh configuration
   };
+
+  # Back up existing zsh dotfiles on first apply
+  home.file.".zshrc".backupExtension = "backup";
+  home.file.".zshenv".backupExtension = "backup";
 }
