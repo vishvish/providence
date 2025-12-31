@@ -157,11 +157,10 @@
 
   home.sessionVariables.SHELL = "${pkgs.zsh}/bin/zsh";
 
-  # Set login shell to the Nix-provided zsh using dscl (macOS)
+  # Set login shell to the Nix-provided zsh using dscl (macOS), without relying on awk in PATH
   home.activation.setLoginShell = lib.hm.dag.entryAfter [ "linkGeneration" ] ''
-    export PATH="/usr/bin:/bin:${pkgs.gawk}/bin:$PATH"
     desired="${pkgs.zsh}/bin/zsh"
-    current=$(/usr/bin/dscl . -read /Users/"$USER" UserShell 2>/dev/null | /usr/bin/awk '{print $2}')
+    current=$(/usr/bin/dscl . -read /Users/"$USER" UserShell 2>/dev/null | /usr/bin/sed -n 's/^UserShell: //p')
     if [ "$current" != "$desired" ]; then
       if command -v sudo >/dev/null 2>&1; then
         echo "Setting login shell to $desired (sudo required)..."
