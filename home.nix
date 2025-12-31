@@ -157,6 +157,7 @@
 
   # Set login shell to the Nix-provided zsh using dscl (macOS)
   home.activation.setLoginShell = lib.hm.dag.entryAfter [ "linkGeneration" ] ''
+    export PATH="/usr/bin:/bin:${pkgs.gawk}/bin:$PATH"
     desired="${pkgs.zsh}/bin/zsh"
     current=$(/usr/bin/dscl . -read /Users/"$USER" UserShell 2>/dev/null | /usr/bin/awk '{print $2}')
     if [ "$current" != "$desired" ]; then
