@@ -152,8 +152,10 @@
     # ".aws/config".source = "${dotfiles}/aws/config";
   };
 
-  # Set login shell to the Nix-provided zsh
+  home.sessionVariables.SHELL = "${pkgs.zsh}/bin/zsh";
+
+  # Set login shell to the Nix-provided zsh using dscl (macOS)
   home.activation.setLoginShell = lib.hm.dag.entryAfter [ "linkGeneration" ] ''
-    ${pkgs.zsh}/bin/zsh -c "chsh -s ${pkgs.zsh}/bin/zsh"
+    /usr/bin/dscl . -create /Users/vish UserShell ${pkgs.zsh}/bin/zsh
   '';
 }
