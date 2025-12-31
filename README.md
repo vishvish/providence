@@ -7,21 +7,21 @@ A Nix flake-based home-manager configuration for bootstrapping macOS machines.
 Bootstrap your machine directly from this flake without installing home-manager first:
 
 ```bash
-nix --extra-experimental-features 'nix-command flakes' run --refresh --no-write-lock-file github:vishvish/providence#homeConfigurations.vish@hobbes.activationPackage
+nix --extra-experimental-features 'nix-command flakes' run github:vishvish/providence#homeConfigurations.vish@hobbes.activationPackage
 ```
 
 For `hobbes-x` (Intel Mac):
 
 ```bash
-nix --extra-experimental-features 'nix-command flakes' run --refresh --no-write-lock-file github:vishvish/providence#homeConfigurations.vish@hobbes-x.activationPackage
+nix --extra-experimental-features 'nix-command flakes' run github:vishvish/providence#homeConfigurations.vish@hobbes-x.activationPackage
 ```
 
 Existing `.zshrc` and `.zshenv` will be backed up once to `.backup` before linking.
 
-From GitHub:
+## Local Bootstrap (from cloned repo)
 
 ```bash
-nix --extra-experimental-features 'nix-command flakes' run --no-write-lock-file github:vishvish/providence#homeConfigurations.vish@hobbes.activationPackage
+home-manager switch --flake .#vish@hobbes
 ```
 
 ## After Initial Bootstrap
