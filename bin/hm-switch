@@ -10,17 +10,33 @@ set -euo pipefail
 #
 # Usage: ./bin/hm-switch [extra home-manager args]
 
-# Resolve real script location even if called via symlink
-SCRIPT_PATH="$0"
-if [ -L "$SCRIPT_PATH" ]; then
-  SCRIPT_PATH=$(readlink "$SCRIPT_PATH")
+# Resolve real script location even if called via symlink or PATH
+ORIG_PATH="${BASH_SOURCE[0]:-$0}"
+if [ "${ORIG_PATH#/}" = "$ORIG_PATH" ]; then
+  ORIG_PATH="$(pwd)/$ORIG_PATH"
 fi
+SCRIPT_PATH=$(python3 - <<'PY' "$ORIG_PATH")
+import os, sys
+print(os.path.realpath(sys.argv[1]))
+PY
 SCRIPT_DIR=$(cd -- "$(dirname -- "$SCRIPT_PATH")" && pwd)
 REPO_ROOT=$(cd -- "$SCRIPT_DIR/.." && pwd)
 
 LOCK_FILE="$REPO_ROOT/flake.lock"
 CONFIG="${HM_CONFIG:-vish@hobbes}"
-LOCAL_DOTFILES="${DOTFILES_LOCAL:-$HOME/git/system/dotfiles}"
+
+# Prefer explicit DOTFILES_LOCAL; otherwise pick the first existing candidate
+LOCAL_DOTFILES="${DOTFILES_LOCAL:-}"
+if [ -z "$LOCAL_DOTFILES" ]; then
+  for candidate in "$HOME/git/dotfiles" "$HOME/git/system/dotfiles"; do
+    if [ -d "$candidate/.git" ]; then
+      LOCAL_DOTFILES="$candidate"
+      break
+    fi
+  done
+fi
+# Fallback to the first candidate if nothing exists (will be treated as unusable)
+LOCAL_DOTFILES="${LOCAL_DOTFILES:-$HOME/git/dotfiles}"
 
 get_locked_rev() {
   if [ ! -f "$LOCK_FILE" ]; then
