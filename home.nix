@@ -17,14 +17,13 @@
     direnv
     duf
     dust
+    delta
     eza
     exiftool
     figlet
-    forgit
     fortune
     gh
     git
-    git-delta
     git-extras
     git-filter-repo
     gitleaks
@@ -33,16 +32,14 @@
     lolcat
     magic-wormhole
     macchina
-    midnight-commander
+    mc
     mkcert
-    mole
     nmap
     pandoc
     pgcli
     rename
     ripgrep
     shellcheck
-    snitch
     starship
     tokei
     tree
@@ -82,8 +79,6 @@
     uv
 
     # Database and data tools
-    json-c
-    msgpack
     postgresql_16
     visidata
 
