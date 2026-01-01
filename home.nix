@@ -22,6 +22,7 @@
     atuin
     bat
     bottom
+    cowsay
     ctags
     d2
     deno
@@ -49,6 +50,7 @@
     nmap
     pandoc
     pgcli
+    pinentry_mac
     pokemonsay
     ponysay
     rename
@@ -95,6 +97,7 @@
 
     # Database and data tools
     postgresql_16
+    sqlite
     visidata
 
     # Media and graphics
@@ -115,6 +118,36 @@
     alejandra
     statix
     deadnix
+
+    # Added from Homebrew casks
+    _1password-cli
+    angband
+    arq
+    brave
+    bruno
+    dbeaver-bin
+    discord
+    dosbox
+    dropbox
+    firefox-devedition
+    github-copilot-cli
+    joplin-desktop
+    keybase
+    macfuse-stubs
+    nerd-fonts.monaspace
+    rectangle
+    signal-desktop
+    slack
+    tailscale
+    telegram-desktop
+    texlivePackages.scheme-full
+    transmission_4
+    upterm
+    vlc
+    wesnoth
+    whatsapp-for-mac
+    whisky
+    xld
   ];
 
   # Just install zsh as a package - we manage config via dotfiles
