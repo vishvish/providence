@@ -121,6 +121,7 @@
 
     # Added from Homebrew casks
     _1password-cli
+    _1password-gui
     angband
     arq
     brave
@@ -128,7 +129,6 @@
     dbeaver-bin
     discord
     dosbox
-    dropbox
     firefox-devedition
     github-copilot-cli
     joplin-desktop
@@ -136,15 +136,11 @@
     macfuse-stubs
     nerd-fonts.monaspace
     rectangle
-    signal-desktop
     slack
     tailscale
-    telegram-desktop
     texlivePackages.scheme-full
     transmission_4
     upterm
-    vlc
-    wesnoth
     whatsapp-for-mac
     whisky
     xld
@@ -202,6 +198,20 @@
   };
 
   home.sessionVariables.SHELL = "${pkgs.zsh}/bin/zsh";
+
+  # Whitelist specific unfree packages (e.g. 1Password) 
+  nixpkgs.config = {
+    allowUnfreePredicate = pkg: builtins.elem (lib.getName pkg) [
+      "1password-cli"
+      "1password"
+      "1password-gui"
+      "arq"
+      "discord"
+      "github-copilot-cli"
+      "slack"
+      "whatsapp-for-mac"
+    ];
+  };
 
   # Set login shell to the Nix-provided zsh (macOS)
   # 1. Add zsh to /etc/shells if not present
