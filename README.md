@@ -98,3 +98,52 @@ To update the pin after pushing dotfiles:
 nix flake lock --update-input dotfiles
 ```
 
+
+## Using local dotfiles quickly
+
+Two common workflows are supported: fast iteration via `hm-switch`, and an optional instant-edit approach using symlinks for files you prefer to edit live.
+
+- Fast iteration with `hm-switch` (recommended):
+
+   1. Edit files inside your local dotfiles repo (example path shown below).
+   2. Commit the change locally (no push required):
+
+       ```bash
+       cd ~/git/system/dotfiles
+       # edit e.g. .zshrc
+       git add .zshrc
+       git commit -m "wip: tweak zsh prompt for testing"
+       ```
+
+   3. Run the helper from the `providence` repo to apply your local commit:
+
+       ```bash
+       # from the repo root
+       ./bin/hm-switch
+
+       # or absolute path
+       /Users/vish/git/system/providence/bin/hm-switch
+       ```
+
+   Notes:
+   - `hm-switch` uses the local repo's `HEAD` commit and passes a `git+file://...` URI to `home-manager`. Uncommitted changes will NOT be picked up—you must commit locally first.
+   - No remote push is required to test changes; pushing is only necessary when you want to update the remote and the pinned flake input.
+
+- Instant edits without running `hm-switch` (optional):
+
+   If you want edits to take effect immediately (for example, shell config like `.zshrc`), you can symlink that file directly from your dotfiles repo into your $HOME and remove it from home-manager management.
+
+   ```bash
+   ln -sf ~/git/system/dotfiles/.zshrc ~/.zshrc
+   ```
+
+   Then edit your home-manager config to stop managing that file (remove or comment the `home.file.".zshrc"` entry), and run a single `home-manager switch` to ensure there's no conflict:
+
+   ```bash
+   home-manager switch --flake ".#vish@hobbes"
+   ```
+
+   Warning: if a file is still managed by home-manager, it may be overwritten on the next `home-manager switch`. Use this approach only for files you explicitly want to keep outside of home-manager control.
+
+Both approaches are useful: prefer `hm-switch` for reproducible, managed dotfiles and use symlinks for rapid, local-only iteration when you need immediate feedback.
+
