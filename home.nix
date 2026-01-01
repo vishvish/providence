@@ -128,7 +128,6 @@
     bruno
     dbeaver-bin
     discord
-    dosbox
     firefox-devedition
     github-copilot-cli
     joplin-desktop
@@ -137,11 +136,9 @@
     nerd-fonts.monaspace
     rectangle
     slack
-    tailscale
     texlivePackages.scheme-full
     transmission_4
     upterm
-    whatsapp-for-mac
     whisky
     xld
   ];
@@ -209,9 +206,23 @@
       "discord"
       "github-copilot-cli"
       "slack"
-      "whatsapp-for-mac"
     ];
   };
+
+  # Symlink any GUI apps from the Nix profile into ~/Applications for Finder
+  home.activation.linkProfileApplications = lib.hm.dag.entryAfter [ "linkGeneration" ] ''
+    PROFILE_APPS="$HOME/.nix-profile/Applications"
+    TARGET_DIR="$HOME/Applications"
+
+    if [ -d "$PROFILE_APPS" ]; then
+      mkdir -p "$TARGET_DIR"
+      for app in "$PROFILE_APPS"/*.app; do
+        [ -e "$app" ] || continue
+        base=$(basename "$app")
+        ln -sfn "$app" "$TARGET_DIR/$base"
+      done
+    fi
+  '';
 
   # Set login shell to the Nix-provided zsh (macOS)
   # 1. Add zsh to /etc/shells if not present
