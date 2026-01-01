@@ -147,3 +147,9 @@ Two common workflows are supported: fast iteration via `hm-switch`, and an optio
 
 Both approaches are useful: prefer `hm-switch` for reproducible, managed dotfiles and use symlinks for rapid, local-only iteration when you need immediate feedback.
 
+## License
+
+This repository is licensed under the Creative Commons Attribution-ShareAlike 4.0 International
+(CC BY-SA 4.0). See the [LICENSE](LICENSE) file for the full legal text and details on how
+to attribute and redistribute derivative works.
+
