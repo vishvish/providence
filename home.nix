@@ -55,6 +55,7 @@
     ponysay
     rename
     ripgrep
+    sccache
     shellcheck
     starship
     tmux
@@ -182,7 +183,10 @@
     ".ssh/config".source = "${dotfiles}/ssh/config";
 
     # And other configs...
-    ".config/nvim".source = "${dotfiles}/config/nvim";
+    ".config/nvim" = {
+      source = "${dotfiles}/config/nvim";
+      recursive = true;
+    };
     ".config/starship.toml".source = "${dotfiles}/config/starship.toml";
     ".config/atuin".source = "${dotfiles}/config/atuin";
     ".config/tmuxinator".source = "${dotfiles}/config/tmuxinator";
@@ -245,5 +249,10 @@
       echo "Setting login shell to $ZSH_PATH..."
       /usr/bin/chsh -s "$ZSH_PATH"
     fi
+  '';
+
+  # Ensure nvim-treesitter parser directory exists
+  home.activation.nvimTreesitterParser = lib.hm.dag.entryAfter ["writeBoundary"] ''
+    mkdir -p "$HOME/.local/share/nvim/lazy/nvim-treesitter/parser"
   '';
 }

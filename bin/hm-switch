@@ -50,12 +50,13 @@ find_flake_root() {
   echo "github:vishvish/providence"
 }
 
+# Resolve flake root now that the function is declared
 FLAKE_ROOT=$(find_flake_root)
 
 # Prefer explicit DOTFILES_LOCAL; otherwise pick the first existing candidate
 LOCAL_DOTFILES="${DOTFILES_LOCAL:-}"
 if [ -z "$LOCAL_DOTFILES" ]; then
-  for candidate in "$HOME/git/dotfiles" "$HOME/git/system/dotfiles"; do
+  for candidate in "$HOME/git/system/dotfiles" "$HOME/git/dotfiles"; do
     if [ -d "$candidate/.git" ]; then
       LOCAL_DOTFILES="$candidate"
       break
@@ -63,42 +64,70 @@ if [ -z "$LOCAL_DOTFILES" ]; then
   done
 fi
 # Fallback to the first candidate if nothing exists (will be treated as unusable)
-LOCAL_DOTFILES="${LOCAL_DOTFILES:-$HOME/git/dotfiles}"
+LOCAL_DOTFILES="${LOCAL_DOTFILES:-$HOME/git/system/dotfiles}"
 
+# Function to get locked rev (must be defined before use)
 get_locked_rev() {
   if [ ! -f "$LOCK_FILE" ]; then
     return 1
   fi
-  python3 -c 'import json,sys,pathlib;
-from pathlib import Path
-lock = json.load(Path(sys.argv[1]).open())
-node = lock.get("nodes", {}).get("dotfiles", {})
-rev = node.get("locked", {}).get("rev")
-print(rev) if rev else None' "$LOCK_FILE"
+  python3 -c 'import json,sys; from pathlib import Path; lock=json.load(Path(sys.argv[1]).open()); node=lock.get("nodes",{}).get("dotfiles",{}); rev=node.get("locked",{}).get("rev"); print(rev) if rev else None' "$LOCK_FILE"
 }
 
-locked_rev=$(get_locked_rev "$LOCK_FILE" || true)
+# Decide whether to use local or remote dotfiles based on which is newer
 use_local=false
+update_remote=false
 
-if [ -d "$LOCAL_DOTFILES/.git" ] && [ -n "$locked_rev" ]; then
-  if git -C "$LOCAL_DOTFILES" cat-file -e "$locked_rev^{commit}" 2>/dev/null; then
-    if git -C "$LOCAL_DOTFILES" merge-base --is-ancestor "$locked_rev" HEAD 2>/dev/null; then
+if [ -d "$LOCAL_DOTFILES/.git" ]; then
+  # Fetch latest remote
+  git -C "$LOCAL_DOTFILES" fetch origin >&2 || true
+  local_head=$(git -C "$LOCAL_DOTFILES" rev-parse HEAD)
+  remote_head=$(git -C "$LOCAL_DOTFILES" rev-parse origin/HEAD 2>/dev/null || git -C "$LOCAL_DOTFILES" rev-parse origin/master 2>/dev/null || true)
+  locked_rev=$(get_locked_rev "$LOCK_FILE" || true)
+
+  # If local is ahead of remote, or diverged, use local
+  if [ -n "$remote_head" ] && [ "$local_head" != "$remote_head" ]; then
+    if git -C "$LOCAL_DOTFILES" merge-base --is-ancestor "$remote_head" "$local_head"; then
+      use_local=true
+    else
+      # Diverged: prefer local for safety
       use_local=true
     fi
+  elif [ -n "$locked_rev" ] && [ "$local_head" != "$locked_rev" ]; then
+    # Local is different from locked, use local
+    use_local=true
+  else
+    # Local matches remote, use remote (update flake.lock)
+    update_remote=true
   fi
+else
+  update_remote=true
 fi
 
-flake_ref="$REPO_ROOT#$CONFIG"
 if [ "$use_local" = true ]; then
-  local_ref=$(git -C "$LOCAL_DOTFILES" rev-parse HEAD)
-  local_uri="git+file://$LOCAL_DOTFILES?ref=$local_ref"
-  echo "Using local dotfiles: $LOCAL_DOTFILES@$local_ref (ahead of pinned $locked_rev)" >&2
+  local_uri="git+file://$LOCAL_DOTFILES?ref=$local_head"
+  echo "Using local dotfiles: $LOCAL_DOTFILES@$local_head (newer than remote)" >&2
   exec home-manager switch --flake "$FLAKE_ROOT#$CONFIG" --override-input dotfiles "$local_uri" "$@"
+elif [ "$update_remote" = true ]; then
+  echo "Updating flake.lock for dotfiles (using latest remote)..." >&2
+  (cd "$REPO_ROOT" && nix flake lock --update-input dotfiles) >&2
+  exec home-manager switch --flake "$FLAKE_ROOT#$CONFIG" "$@"
 else
-  if [ -d "$LOCAL_DOTFILES/.git" ] && [ -n "$locked_rev" ]; then
-    echo "Local dotfiles not ahead of pinned $locked_rev; using pinned flake input." >&2
-  else
-    echo "No usable local dotfiles; using pinned flake input." >&2
-  fi
+  echo "No usable local dotfiles; using pinned flake input." >&2
   exec home-manager switch --flake "$FLAKE_ROOT#$CONFIG" "$@"
 fi
+
+# Prefer explicit DOTFILES_LOCAL; otherwise pick the first existing candidate
+LOCAL_DOTFILES="${DOTFILES_LOCAL:-}"
+if [ -z "$LOCAL_DOTFILES" ]; then
+  for candidate in "$HOME/git/system/dotfiles" "$HOME/git/dotfiles"; do
+    if [ -d "$candidate/.git" ]; then
+      LOCAL_DOTFILES="$candidate"
+      break
+    fi
+  done
+fi
+# Fallback to the first candidate if nothing exists (will be treated as unusable)
+LOCAL_DOTFILES="${LOCAL_DOTFILES:-$HOME/git/system/dotfiles}"
+
+
