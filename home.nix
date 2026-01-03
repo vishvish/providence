@@ -65,6 +65,7 @@
     wtfutil
     yazi
     yq
+    yt-dlp
     zoxide
     zsh
     zsh-completions
@@ -187,6 +188,8 @@
     ".config/tmuxinator".source = "${dotfiles}/config/tmuxinator";
     ".config/eza".source = "${dotfiles}/config/eza";
     ".config/eza-themes".source = "${dotfiles}/config/eza-themes";
+    ".config/ghostty".source = "${dotfiles}/config/ghostty";
+    ".config/instaloader".source = "${dotfiles}/config/instaloader";
 
     # Add more as needed:
     # ".config/helix".source = "${dotfiles}/config/helix";
